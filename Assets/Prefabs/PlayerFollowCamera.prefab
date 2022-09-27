@@ -149,7 +149,7 @@ MonoBehaviour:
   Damping: {x: 0, y: 0, z: 0}
   ShoulderOffset: {x: 0, y: 0, z: 0}
   VerticalArmLength: 0
-  CameraSide: 0.6
+  CameraSide: 0.5
   CameraDistance: 0
   CameraCollisionFilter:
     serializedVersion: 2

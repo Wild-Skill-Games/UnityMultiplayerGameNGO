@@ -23,12 +23,6 @@ namespace StarterAssets
         public float jumpTimeout = 0.1f;
         public float fallTimeout = 0.15f;
 
-        [Header("Player Grounded")]
-        public bool grounded = true;
-        public float groundedOffset = -0.14f;
-        public float groundedRadius = 0.5f;
-        public LayerMask groundLayers;
-
         [Header("Cinemachine")]
         public GameObject cinemachineCameraTarget;
         public float topClamp = 90.0f;
@@ -45,8 +39,6 @@ namespace StarterAssets
         private float _fallTimeoutDelta;
 
         private CharacterController _controller;
-
-        private const float _threshold = 0.01f;
 
         #endregion
 
@@ -73,31 +65,21 @@ namespace StarterAssets
         private void Update()
         {
             JumpAndGravity();
-            GroundedCheck();
             Movement();
+            CameraStuff();
         }
 
-        private void LateUpdate()
+        private void CameraStuff()
         {
-            if (Look.sqrMagnitude >= _threshold)
-            {
-                _cinemachineTargetPitch += Look.y * rotationSpeed;
-                _rotationVelocity = Look.x * rotationSpeed;
+            _cinemachineTargetPitch += Look.y * rotationSpeed;
+            _rotationVelocity = Look.x * rotationSpeed;
 
-                _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, bottomClamp, topClamp);
+            _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, bottomClamp, topClamp);
 
-                cinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+            cinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
 
-                transform.Rotate(Vector3.up * _rotationVelocity);
-            }
+            transform.Rotate(Vector3.up * _rotationVelocity);
         }
-
-        private void GroundedCheck()
-        {
-            Vector3 spherePosition = new(transform.position.x, transform.position.y - groundedOffset, transform.position.z);
-            grounded = Physics.CheckSphere(spherePosition, groundedRadius, groundLayers, QueryTriggerInteraction.Ignore);
-        }
-
 
         private void Movement()
         {
@@ -135,7 +117,7 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            if (grounded)
+            if (_controller.isGrounded)
             {
                 _fallTimeoutDelta = fallTimeout;
 
@@ -185,23 +167,6 @@ namespace StarterAssets
             }
 
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Color transparentGreen = new(0.0f, 1.0f, 0.0f, 0.35f);
-            Color transparentRed = new(1.0f, 0.0f, 0.0f, 0.35f);
-
-            if (grounded)
-            {
-                Gizmos.color = transparentGreen;
-            }
-            else
-            {
-                Gizmos.color = transparentRed;
-            }
-
-            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z), groundedRadius);
         }
     }
 }
